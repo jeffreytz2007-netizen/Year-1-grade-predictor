@@ -125,7 +125,7 @@ for module_name, module_info in modules.items():
         max_mark = component_info["max_mark"]
         step = component_info["step"]
 
-        default_value = 0.7 * max_mark
+        default_value = 0.0
 
         score = st.slider(
             f"{component_name} ({weight * 100:.1f}% of the module, out of {max_mark})",

@@ -1,14 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun  5 19:52:00 2026
+
+@author: Jeffrey
+"""
+
 import streamlit as st
 
-modules = {
+modules = {}
+
+core_modules = {
     "Mechanics": {
         "module_weight": 0.25,
         "components": {
             "Mechanics exam": {"weight": 0.70, "max_mark": 100, "step": 1},
             "Mechanics APS 1": {"weight": 0.04, "max_mark": 10, "step": 1},
             "Mechanics APS 2": {"weight": 0.04, "max_mark": 10, "step": 1},
-            "Relativity APS 1": {"weight": 0.06, "max_mark": 50, "step": 1},
-            "Relativity APS 2": {"weight": 0.06, "max_mark": 50, "step": 1},
+            "Relativity APS 1": {"weight": 0.06, "max_mark": 10, "step": 1},
+            "Relativity APS 2": {"weight": 0.06, "max_mark": 10, "step": 1},
             "Relativity MCQ": {"weight": 0.005, "max_mark": 1, "step": 1},
             "Term 1 Seminars": {"weight": 0.05, "max_mark": 5, "step": 1},
             "Term 3 Seminars": {"weight": 0.02, "max_mark": 2, "step": 1},
@@ -47,15 +56,6 @@ modules = {
             "Problem Solving Test": {"weight": 0.30, "max_mark": 100, "step": 2},
         }
     },
-    "Advanced Electronics": {
-        "module_weight": 1/12,
-        "components": {
-            "Quiz 1": {"weight": 0.05, "max_mark": 8, "step": 1},
-            "Quiz 2": {"weight": 0.05, "max_mark": 8, "step": 1},
-            "Quiz 3": {"weight": 0.05, "max_mark": 8, "step": 1},
-            "Report": {"weight": 0.85, "max_mark": 130, "step": 1},
-        }
-    },
     "Statistics of Measurement and Summer Project": {
         "module_weight": 0.125,
         "components": {
@@ -65,6 +65,27 @@ modules = {
         }
     }
 }
+
+elective_modules = {
+    "Elective Module":{
+        "Advanced Electronics": {
+            "module_weight": 1/12,
+            "components": {
+                "Quiz 1": {"weight": 0.15, "max_mark": 8, "step": 1},
+                "Quiz 2": {"weight": 0.15, "max_mark": 8, "step": 1},
+                "Quiz 3": {"weight": 0.15, "max_mark": 8, "step": 1},
+                "Report": {"weight": 0.85, "max_mark": 130, "step": 1}
+                }
+            },
+        "Maths Analysis": {
+            "module_weight": 1/12,
+            "components": {
+                "Exam": {"weight": 1.00, "max_mark": 100, "step": 1}
+                }
+            }
+        }
+     }
+
 
 def classify_grade(mark):
     if mark >= 70:
@@ -86,6 +107,14 @@ st.title("First Year Physics Grade Predictor")
 overall_mark = 0
 module_results = {}
 
+selected_elective = st.selectbox(
+    "Choose your elective module:",
+    list(elective_modules["Elective Module"].keys())
+)
+
+modules.update(core_modules)
+modules[selected_elective] = elective_modules["Elective Module"][selected_elective]
+    
 for module_name, module_info in modules.items():
     st.subheader(f"{module_name} ({module_info['module_weight'] * 100:.1f}% of the year)")
 
@@ -96,7 +125,7 @@ for module_name, module_info in modules.items():
         max_mark = component_info["max_mark"]
         step = component_info["step"]
 
-        default_value = 0 * max_mark
+        default_value = 0.7 * max_mark
 
         score = st.slider(
             f"{component_name} ({weight * 100:.1f}% of the module, out of {max_mark})",
@@ -115,6 +144,7 @@ for module_name, module_info in modules.items():
 
     st.write(f"Module mark: {module_mark:.2f}%")
     st.divider()
+
 
 st.header("Results")
 

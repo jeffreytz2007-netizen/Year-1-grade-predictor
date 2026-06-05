@@ -71,9 +71,9 @@ elective_modules = {
         "Advanced Electronics": {
             "module_weight": 1/12,
             "components": {
-                "Quiz 1": {"weight": 0.15, "max_mark": 8, "step": 1},
-                "Quiz 2": {"weight": 0.15, "max_mark": 8, "step": 1},
-                "Quiz 3": {"weight": 0.15, "max_mark": 8, "step": 1},
+                "Quiz 1": {"weight": 0.05, "max_mark": 8, "step": 1},
+                "Quiz 2": {"weight": 0.05, "max_mark": 8, "step": 1},
+                "Quiz 3": {"weight": 0.05, "max_mark": 8, "step": 1},
                 "Report": {"weight": 0.85, "max_mark": 130, "step": 1}
                 }
             },

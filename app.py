@@ -7,8 +7,6 @@ Created on Fri Jun  5 19:52:00 2026
 
 import streamlit as st
 
-modules = {}
-
 core_modules = {
     "Mechanics": {
         "module_weight": 0.25,
@@ -43,7 +41,7 @@ core_modules = {
             "VFEM Exam": {"weight": 0.80, "max_mark": 100, "step": 1},
             "VFEM APS 1": {"weight": 0.06, "max_mark": 10, "step": 1},
             "VFEM APS 2": {"weight": 0.06, "max_mark": 11, "step": 1},
-            "Peerwise": {"weight": 0.08, "max_mark": 8, "step": 0.1},
+            "Peerwise": {"weight": 0.08, "max_mark": 8.0, "step": 0.1},
         }
     },
     "Practical Physics": {
@@ -66,26 +64,24 @@ core_modules = {
     }
 }
 
-elective_modules = {
-    "Elective Module":{
-        "Advanced Electronics": {
-            "module_weight": 1/12,
-            "components": {
-                "Quiz 1": {"weight": 0.05, "max_mark": 8, "step": 1},
-                "Quiz 2": {"weight": 0.05, "max_mark": 8, "step": 1},
-                "Quiz 3": {"weight": 0.05, "max_mark": 8, "step": 1},
-                "Report": {"weight": 0.85, "max_mark": 130, "step": 1}
-                }
-            },
-        "Maths Analysis": {
-            "module_weight": 1/12,
-            "components": {
-                "Exam": {"weight": 1.00, "max_mark": 100, "step": 1}
-                }
-            }
+elective_group = {
+    "Advanced Electronics": {
+        "module_weight": 1/12,
+        "components": {
+            "Quiz 1": {"weight": 0.05, "max_mark": 8, "step": 1},
+            "Quiz 2": {"weight": 0.05, "max_mark": 8, "step": 1},
+            "Quiz 3": {"weight": 0.05, "max_mark": 8, "step": 1},
+            "Report": {"weight": 0.85, "max_mark": 130, "step": 1},
         }
-     }
-
+    },
+    "Maths Analysis": {
+        "module_weight": 1/12,
+        "components": {
+            "Analysis Exam": {"weight": 1.00, "max_mark": 100, "step": 1},
+            
+        }
+    }
+}
 
 def classify_grade(mark):
     if mark >= 70:
@@ -97,24 +93,33 @@ def classify_grade(mark):
     elif mark >= 40:
         return "Third"
     else:
-        return "Retake needed"
+        return "Ur Cooked"
 
 def raw_to_percentage(score, max_mark):
     return (score / max_mark) * 100 if max_mark > 0 else 0
 
+def sync_from_slider(value_key, slider_key, typed_key):
+    st.session_state[value_key] = st.session_state[slider_key]
+    st.session_state[typed_key] = st.session_state[slider_key]
+
+def sync_from_typed(value_key, slider_key, typed_key):
+    st.session_state[value_key] = st.session_state[typed_key]
+    st.session_state[slider_key] = st.session_state[typed_key]
+
 st.title("First Year Physics Grade Predictor")
+
+selected_elective = st.selectbox(
+    "Choose your elective module",
+    list(elective_group.keys())
+)
+
+modules = {}
+modules.update(core_modules)
+modules[selected_elective] = elective_group[selected_elective]
 
 overall_mark = 0
 module_results = {}
 
-selected_elective = st.selectbox(
-    "Choose your elective module:",
-    list(elective_modules["Elective Module"].keys())
-)
-
-modules.update(core_modules)
-modules[selected_elective] = elective_modules["Elective Module"][selected_elective]
-    
 for module_name, module_info in modules.items():
     st.subheader(f"{module_name} ({module_info['module_weight'] * 100:.1f}% of the year)")
 
@@ -122,19 +127,49 @@ for module_name, module_info in modules.items():
 
     for component_name, component_info in module_info["components"].items():
         weight = component_info["weight"]
-        max_mark = component_info["max_mark"]
-        step = component_info["step"]
+        max_mark = float(component_info["max_mark"])
+        step = float(component_info["step"])
+        default_value = float(0 * max_mark)
 
-        default_value = 0.0
+        safe_name = f"{module_name}_{component_name}"
+        value_key = f"value_{safe_name}"
+        slider_key = f"slider_{safe_name}"
+        typed_key = f"typed_{safe_name}"
 
-        score = st.slider(
-            f"{component_name} ({weight * 100:.1f}% of the module, out of {max_mark})",
-            min_value=0.0,
-            max_value=float(max_mark),
-            value=float(default_value),
-            step=float(step),
-            key=f"{module_name}_{component_name}"
-        )
+        if value_key not in st.session_state:
+            st.session_state[value_key] = default_value
+        if slider_key not in st.session_state:
+            st.session_state[slider_key] = st.session_state[value_key]
+        if typed_key not in st.session_state:
+            st.session_state[typed_key] = st.session_state[value_key]
+
+        st.write(f"**{component_name}** ({weight * 100:.1f}% of the module, out of {max_mark:g})")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.slider(
+                f"{component_name} slider",
+                min_value=0.0,
+                max_value=max_mark,
+                step=step,
+                key=slider_key,
+                on_change=sync_from_slider,
+                args=(value_key, slider_key, typed_key)
+            )
+
+        with col2:
+            st.number_input(
+                f"{component_name} typed entry",
+                min_value=0.0,
+                max_value=max_mark,
+                step=step,
+                key=typed_key,
+                on_change=sync_from_typed,
+                args=(value_key, slider_key, typed_key)
+            )
+
+        score = st.session_state[value_key]
 
         percentage_score = raw_to_percentage(score, max_mark)
         module_mark += percentage_score * weight
@@ -144,7 +179,6 @@ for module_name, module_info in modules.items():
 
     st.write(f"Module mark: {module_mark:.2f}%")
     st.divider()
-
 
 st.header("Results")
 

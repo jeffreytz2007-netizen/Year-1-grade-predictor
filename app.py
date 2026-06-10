@@ -188,4 +188,3 @@ for module_name, module_mark in module_results.items():
 
 st.metric("Overall Year Mark", f"{overall_mark:.2f}%")
 st.write(f"**Classification:** {classify_grade(overall_mark)}")
-st.write(f"**Classification:** {classify_grade(overall_mark)}")

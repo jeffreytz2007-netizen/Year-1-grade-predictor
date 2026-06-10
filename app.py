@@ -59,7 +59,8 @@ core_modules = {
         "components": {
             "Seminars": {"weight": 0.03, "max_mark": 2, "step": 1},
             "Statistics Quiz": {"weight": 0.27, "max_mark": 100, "step": 1},
-            "Summer Project": {"weight": 0.70, "max_mark": 100, "step": 1},
+            "Summer Project Writeup": {"weight": 7/30, "max_mark": 100, "step": 1},
+            "Summer Project Video": {"weight": 7/15, "max_mark": 100, "step": 1},
         }
     }
 }
@@ -186,4 +187,5 @@ for module_name, module_mark in module_results.items():
     st.write(f"**{module_name}:** {module_mark:.2f}%")
 
 st.metric("Overall Year Mark", f"{overall_mark:.2f}%")
+st.write(f"**Classification:** {classify_grade(overall_mark)}")
 st.write(f"**Classification:** {classify_grade(overall_mark)}")

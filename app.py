@@ -59,8 +59,7 @@ core_modules = {
         "components": {
             "Seminars": {"weight": 0.03, "max_mark": 2, "step": 1},
             "Statistics Quiz": {"weight": 0.27, "max_mark": 100, "step": 1},
-            "Summer Project Writeup": {"weight": 7/30, "max_mark": 100, "step": 1},
-            "Summer Project Video": {"weight": 7/15, "max_mark": 100, "step": 1},
+            "Summer Project Writeup": {"weight": 0.7, "max_mark": 100, "step": 1},
         }
     }
 }
